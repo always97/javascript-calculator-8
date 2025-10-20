@@ -35,14 +35,22 @@ class StringCalculator {
 }
 
 class App {
-  async getUserNumber() {
-    const userInput = await MissionUtils.Console.readLineAsync(
-      "덧셈할 문자열을 입력해 주세요. \n"
-    );
+  constructor() {
+    this.calculator = new StringCalculator();
   }
 
   async run() {
-    await this.getUserNumber();
+    try {
+      const userInput = await MissionUtils.Console.readLineAsync(
+        "덧셈할 문자열을 입력해 주세요.\n"
+      );
+
+      const result = this.calculator.calculate(userInput);
+      MissionUtils.Console.print(`결과 : ${result}`);
+    } catch (error) {
+      MissionUtils.Console.print(error.message);
+      throw error;
+    }
   }
 }
 
