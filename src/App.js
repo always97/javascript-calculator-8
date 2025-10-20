@@ -14,21 +14,24 @@ class StringCalculator {
       if (!match) {
         throw new Error("[ERROR] 커스텀 구분자 형식이 올바르지 않습니다.");
       }
-      delimiter = new RegExp(match[1].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")); // 정규식 특수문자 escape
+
+      const customDelimiter = match[1];
+      if (customDelimiter.length !== 1) {
+        throw new Error("[ERROR] 커스텀 구분자는 한 글자여야 합니다.");
+      }
+      delimiter = new RegExp(
+        customDelimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+      );
       numbersString = match[2];
     }
 
-    if (numbersString.endsWith(",") || numbersString.endsWith(":")) {
-      throw new Error("[ERROR] 잘못된 입력 형식입니다.");
+    if (numbersString.split(delimiter).some((token) => token === "")) {
+      throw new Error(
+        "[ERROR] 잘못된 입력 형식입니다. (숫자가 없거나 연속된 구분자)"
+      );
     }
 
-    const numberTokens = numbersString.split(delimiter);
-
-    if (numberTokens.some((token) => token === "")) {
-      throw new Error("[ERROR] 잘못된 입력 형식입니다. (연속된 구분자)");
-    }
-
-    const numbers = numberTokens.map(Number);
+    const numbers = numbersString.split(delimiter).map(Number);
 
     const sum = numbers.reduce((currentSum, num) => {
       if (isNaN(num)) {
@@ -43,6 +46,7 @@ class StringCalculator {
     return sum;
   }
 }
+
 class App {
   constructor() {
     this.calculator = new StringCalculator();
