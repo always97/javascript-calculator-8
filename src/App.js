@@ -6,7 +6,7 @@ class StringCalculator {
       return 0;
     }
 
-    let delimiter = /[,\:]/; // 기본 구분자 (쉼표 또는 콜론)
+    let delimiter = /[,\:]/;
     let numbersString = text;
 
     if (text.startsWith("//")) {
@@ -14,11 +14,21 @@ class StringCalculator {
       if (!match) {
         throw new Error("[ERROR] 커스텀 구분자 형식이 올바르지 않습니다.");
       }
-      delimiter = match[1];
+      delimiter = new RegExp(match[1].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")); // 정규식 특수문자 escape
       numbersString = match[2];
     }
 
-    const numbers = numbersString.split(delimiter).map(Number);
+    if (numbersString.endsWith(",") || numbersString.endsWith(":")) {
+      throw new Error("[ERROR] 잘못된 입력 형식입니다.");
+    }
+
+    const numberTokens = numbersString.split(delimiter);
+
+    if (numberTokens.some((token) => token === "")) {
+      throw new Error("[ERROR] 잘못된 입력 형식입니다. (연속된 구분자)");
+    }
+
+    const numbers = numberTokens.map(Number);
 
     const sum = numbers.reduce((currentSum, num) => {
       if (isNaN(num)) {
@@ -33,7 +43,6 @@ class StringCalculator {
     return sum;
   }
 }
-
 class App {
   constructor() {
     this.calculator = new StringCalculator();
