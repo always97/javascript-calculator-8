@@ -10,28 +10,28 @@ class StringCalculator {
 
     const num = Number(trimmedStr);
 
-    if (isNaN(num)) {
-      throw new Error("[ERROR] 유효하지 않은 숫자가 포함되어 있습니다.");
+    if (isNaN(num) || !Number.isInteger(num)) {
+      throw new Error(
+        "[ERROR] 유효하지 않은 숫자(정수 아님)가 포함되어 있습니다."
+      );
     }
-    if (num < 0) {
-      throw new Error("[ERROR] 음수는 입력할 수 없습니다.");
-    }
-    if (!Number.isInteger(num)) {
-      throw new Error("[ERROR] 정수만 입력 가능합니다.");
+
+    if (num <= 0) {
+      throw new Error("[ERROR] 양수만 입력할 수 있습니다.");
     }
 
     return num;
   }
 
   calculate(text) {
-    if (!text) {
+    if (text === "") {
       return 0;
     }
 
     let numbers;
 
     if (text.startsWith("//")) {
-      const match = text.match(/\/\/(.+)\n(.*)/s);
+      const match = text.match(/^\/\/(.)\n(.*)/s);
       if (!match) {
         throw new Error("[ERROR] 커스텀 구분자 형식이 올바르지 않습니다.");
       }
@@ -46,9 +46,7 @@ class StringCalculator {
       numbers = text.split(/[,\:]/).map(this.parseAndValidateNumber);
     }
 
-    const sum = numbers.reduce((currentSum, num) => currentSum + num, 0);
-
-    return sum;
+    return numbers.reduce((sum, num) => sum + num, 0);
   }
 }
 
