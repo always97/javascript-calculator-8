@@ -6,7 +6,8 @@ class StringCalculator {
       return 0;
     }
 
-    let delimiter = /[,\:]/;
+    const defaultDelimiters = [",", ":"];
+    let allDelimiters = [...defaultDelimiters];
     let numbersString = text;
 
     if (text.startsWith("//")) {
@@ -16,22 +17,26 @@ class StringCalculator {
       }
 
       const customDelimiter = match[1];
-      if (customDelimiter.length !== 1) {
-        throw new Error("[ERROR] 커스텀 구분자는 한 글자여야 합니다.");
+      if (!customDelimiter) {
+        throw new Error("[ERROR] 커스텀 구분자가 비어있습니다.");
       }
-      delimiter = new RegExp(
-        customDelimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-      );
+
+      allDelimiters.push(customDelimiter); // 기본 구분자에 커스텀 구분자 추가
       numbersString = match[2];
     }
 
-    if (numbersString.split(delimiter).some((token) => token === "")) {
-      throw new Error(
-        "[ERROR] 잘못된 입력 형식입니다. (숫자가 없거나 연속된 구분자)"
-      );
+    const escapedDelimiters = allDelimiters.map(
+      (d) => d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // 정규식 특수문자 이스케이프
+    );
+    const delimiterRegex = new RegExp(escapedDelimiters.join("|"));
+
+    const numberTokens = numbersString.split(delimiterRegex);
+
+    if (numberTokens.some((token) => token === "")) {
+      throw new Error("[ERROR] 잘못된 입력 형식입니다. (연속된 구분자)");
     }
 
-    const numbers = numbersString.split(delimiter).map(Number);
+    const numbers = numberTokens.map(Number);
 
     const sum = numbers.reduce((currentSum, num) => {
       if (isNaN(num)) {
