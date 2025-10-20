@@ -1,3 +1,5 @@
+import { Console } from "@woowacourse/mission-utils";
+
 class StringCalculator {
   parseAndValidateNumber(str) {
     const trimmedStr = str.trim();
@@ -57,14 +59,14 @@ class App {
 
   async run() {
     try {
-      const userInput = await MissionUtils.Console.readLineAsync(
+      const userInput = await Console.readLineAsync(
         "덧셈할 문자열을 입력해 주세요.\n"
       );
 
       const result = this.calculator.calculate(userInput);
-      MissionUtils.Console.print(`결과 : ${result}`);
+      Console.print(`결과 : ${result}`);
     } catch (error) {
-      MissionUtils.Console.print(error.message);
+      Console.print(error.message);
       throw error;
     }
   }
