@@ -1,5 +1,3 @@
-import * as MissionUtils from "@woowacourse/mission-utils";
-
 class StringCalculator {
   calculate(text) {
     if (!text) {
@@ -17,18 +15,23 @@ class StringCalculator {
       }
 
       const customDelimiter = match[1];
-      if (!customDelimiter) {
-        throw new Error("[ERROR] 커스텀 구분자가 비어있습니다.");
+      if (customDelimiter.length !== 1) {
+        throw new Error("[ERROR] 커스텀 구분자는 한 글자여야 합니다.");
       }
 
-      allDelimiters.push(customDelimiter); // 기본 구분자에 커스텀 구분자 추가
+      allDelimiters.push(customDelimiter);
       numbersString = match[2];
     }
 
-    const escapedDelimiters = allDelimiters.map(
-      (d) => d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // 정규식 특수문자 이스케이프
+    const escapedDelimiters = allDelimiters.map((d) =>
+      d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     );
-    const delimiterRegex = new RegExp(escapedDelimiters.join("|"));
+    const validationRegex = new RegExp(`^[0-9${escapedDelimiters.join("")}]+$`);
+    if (numbersString && !validationRegex.test(numbersString)) {
+      throw new Error("[ERROR] 허용되지 않은 문자가 포함되어 있습니다.");
+    }
+
+    const delimiterRegex = new RegExp(`[${escapedDelimiters.join("")}]`);
 
     const numberTokens = numbersString.split(delimiterRegex);
 
